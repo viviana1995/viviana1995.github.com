@@ -1,0 +1,1181 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css"><link rel="stylesheet" href="css/L.Control.Locate.min.css">
+        <link rel="stylesheet" href="css/qgis2web.css"><link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet-control-geocoder.Geocoder.css">
+        <link rel="stylesheet" href="css/leaflet-measure.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script><script src="js/L.Control.Locate.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet-control-geocoder.Geocoder.js"></script>
+        <script src="js/leaflet-measure.js"></script>
+        <script src="data/a_transito_heridos_1.js"></script>
+        <script src="data/a_transito_fallecidos_2.js"></script>
+        <script src="data/Conflicto_UPC_Homicidio_dmq_3.js"></script>
+        <script src="data/deslizamientos_dmq_4.js"></script>
+        <script src="data/Hundimiento_dmq_5.js"></script>
+        <script src="data/inundacion_dmq_6.js"></script>
+        <script src="data/ola_calor_7.js"></script>
+        <script src="data/sismos_dmq_8.js"></script>
+        <script src="data/amenaza_volcanica_dmq_9.js"></script>
+        <script>
+        var highlightLayer;
+        function highlightFeature(e) {
+            highlightLayer = e.target;
+
+            if (e.target.feature.geometry.type === 'LineString') {
+              highlightLayer.setStyle({
+                color: '#ffff00',
+              });
+            } else {
+              highlightLayer.setStyle({
+                fillColor: '#ffff00',
+                fillOpacity: 1
+              });
+            }
+        }
+        var map = L.map('map', {
+            zoomControl:true, maxZoom:14, minZoom:1
+        }).fitBounds([[-1.1686581478295754,-79.9546371106724],[0.623405920628367,-76.79174055968079]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        L.control.locate({locateOptions: {maxZoom: 19}}).addTo(map);
+        var measureControl = new L.Control.Measure({
+            position: 'topleft',
+            primaryLengthUnit: 'meters',
+            secondaryLengthUnit: 'kilometers',
+            primaryAreaUnit: 'sqmeters',
+            secondaryAreaUnit: 'hectares'
+        });
+        measureControl.addTo(map);
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .innerHTML = '';
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .className += ' fas fa-ruler';
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        var layer_OpenStreetMap_0 = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 1,
+            maxZoom: 14,
+            minNativeZoom: 0,
+            maxNativeZoom: 19
+        });
+        layer_OpenStreetMap_0;
+        map.addLayer(layer_OpenStreetMap_0);
+        function pop_a_transito_heridos_1(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">MES</th>\
+                        <td>' + (feature.properties['MES'] !== null ? Autolinker.link(feature.properties['MES'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">AÑO</th>\
+                        <td>' + (feature.properties['ANIO'] !== null ? Autolinker.link(feature.properties['ANIO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">DISTRITO</th>\
+                        <td>' + (feature.properties['DISTRITO'] !== null ? Autolinker.link(feature.properties['DISTRITO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">FECHA</th>\
+                        <td>' + (feature.properties['FECHA'] !== null ? Autolinker.link(feature.properties['FECHA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">CAUSA</th>\
+                        <td>' + (feature.properties['CAUSA'] !== null ? Autolinker.link(feature.properties['CAUSA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">CLASE</th>\
+                        <td>' + (feature.properties['CLASE'] !== null ? Autolinker.link(feature.properties['CLASE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">DAÑOS MATERIALES</th>\
+                        <td>' + (feature.properties['DANOSMATER'] !== null ? Autolinker.link(feature.properties['DANOSMATER'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ZONA</th>\
+                        <td>' + (feature.properties['ZONA'] !== null ? Autolinker.link(feature.properties['ZONA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">DIRECCIÓN</th>\
+                        <td>' + (feature.properties['DIRECCION'] !== null ? Autolinker.link(feature.properties['DIRECCION'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ADMINISTRACIÓN</th>\
+                        <td>' + (feature.properties['ADMINISTRA'] !== null ? Autolinker.link(feature.properties['ADMINISTRA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">COORDENADA X</th>\
+                        <td>' + (feature.properties['X'] !== null ? Autolinker.link(feature.properties['X'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">COORDENADA Y</th>\
+                        <td>' + (feature.properties['Y'] !== null ? Autolinker.link(feature.properties['Y'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_a_transito_heridos_1_0() {
+            return {
+                pane: 'pane_a_transito_heridos_1',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/herido (1).svg',
+            iconSize: [19.0, 19.0]
+        }),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_a_transito_heridos_1');
+        map.getPane('pane_a_transito_heridos_1').style.zIndex = 401;
+        map.getPane('pane_a_transito_heridos_1').style['mix-blend-mode'] = 'normal';
+        var layer_a_transito_heridos_1 = new L.geoJson(json_a_transito_heridos_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_a_transito_heridos_1',
+            layerName: 'layer_a_transito_heridos_1',
+            pane: 'pane_a_transito_heridos_1',
+            onEachFeature: pop_a_transito_heridos_1,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_a_transito_heridos_1_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_a_transito_heridos_1);
+        map.addLayer(layer_a_transito_heridos_1);
+        function pop_a_transito_fallecidos_2(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">MES</th>\
+                        <td>' + (feature.properties['MES'] !== null ? Autolinker.link(feature.properties['MES'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">AÑO</th>\
+                        <td>' + (feature.properties['ANIO'] !== null ? Autolinker.link(feature.properties['ANIO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">DISTRITO</th>\
+                        <td>' + (feature.properties['DISTRITO'] !== null ? Autolinker.link(feature.properties['DISTRITO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">FECHA</th>\
+                        <td>' + (feature.properties['FECHA'] !== null ? Autolinker.link(feature.properties['FECHA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">CAUSA</th>\
+                        <td>' + (feature.properties['CAUSA'] !== null ? Autolinker.link(feature.properties['CAUSA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">CLASE DE ACCIDENTE</th>\
+                        <td>' + (feature.properties['CLASE'] !== null ? Autolinker.link(feature.properties['CLASE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">DAÑOS MATERIALES </th>\
+                        <td>' + (feature.properties['DANOSMATER'] !== null ? Autolinker.link(feature.properties['DANOSMATER'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ZONA</th>\
+                        <td>' + (feature.properties['ZONA'] !== null ? Autolinker.link(feature.properties['ZONA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">DIRECCIÓN</th>\
+                        <td>' + (feature.properties['DIRECCION'] !== null ? Autolinker.link(feature.properties['DIRECCION'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ADMINISTRACIÓN</th>\
+                        <td>' + (feature.properties['ADMINISTRA'] !== null ? Autolinker.link(feature.properties['ADMINISTRA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">COORDENADA X</th>\
+                        <td>' + (feature.properties['X'] !== null ? Autolinker.link(feature.properties['X'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">COORDENADA Y</th>\
+                        <td>' + (feature.properties['Y'] !== null ? Autolinker.link(feature.properties['Y'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_a_transito_fallecidos_2_0() {
+            return {
+                pane: 'pane_a_transito_fallecidos_2',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/cemetery.svg',
+            iconSize: [15.2, 15.2]
+        }),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_a_transito_fallecidos_2');
+        map.getPane('pane_a_transito_fallecidos_2').style.zIndex = 402;
+        map.getPane('pane_a_transito_fallecidos_2').style['mix-blend-mode'] = 'normal';
+        var layer_a_transito_fallecidos_2 = new L.geoJson(json_a_transito_fallecidos_2, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_a_transito_fallecidos_2',
+            layerName: 'layer_a_transito_fallecidos_2',
+            pane: 'pane_a_transito_fallecidos_2',
+            onEachFeature: pop_a_transito_fallecidos_2,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_a_transito_fallecidos_2_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_a_transito_fallecidos_2);
+        map.addLayer(layer_a_transito_fallecidos_2);
+        function pop_Conflicto_UPC_Homicidio_dmq_3(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">GRADO DE CONFLICTO</th>\
+                        <td>' + (feature.properties['Conflicto'] !== null ? Autolinker.link(feature.properties['Conflicto'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        var pattern_Conflicto_UPC_Homicidio_dmq_3_0 = new L.StripePattern({
+            weight: 0.3,
+            spaceWeight: 2.0,
+            color: '#000000',
+            opacity: 1.0,
+            spaceOpacity: 0,
+            angle: 315
+        });
+        pattern_Conflicto_UPC_Homicidio_dmq_3_0.addTo(map);
+        function style_Conflicto_UPC_Homicidio_dmq_3_0(feature) {
+            switch(String(feature.properties['Conflicto'])) {
+                case 'ALTO':
+                    return {
+                pane: 'pane_Conflicto_UPC_Homicidio_dmq_3',
+                opacity: 1,
+                color: 'rgba(255,255,255,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(235,42,32,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'BAJO':
+                    return {
+                pane: 'pane_Conflicto_UPC_Homicidio_dmq_3',
+                opacity: 1,
+                color: 'rgba(255,255,255,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(51,160,44,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'MEDIO':
+                    return {
+                pane: 'pane_Conflicto_UPC_Homicidio_dmq_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(244,242,75,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'MEDIO ALTO':
+                    return {
+                pane: 'pane_Conflicto_UPC_Homicidio_dmq_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,127,0,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'MEDIO BAJO':
+                    return {
+                pane: 'pane_Conflicto_UPC_Homicidio_dmq_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(199,241,170,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'NULO':
+                    return {
+                pane: 'pane_Conflicto_UPC_Homicidio_dmq_3',
+                stroke: false,
+                fillOpacity: 1,
+                fillPattern: pattern_Conflicto_UPC_Homicidio_dmq_3_0,
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_Conflicto_UPC_Homicidio_dmq_3');
+        map.getPane('pane_Conflicto_UPC_Homicidio_dmq_3').style.zIndex = 403;
+        map.getPane('pane_Conflicto_UPC_Homicidio_dmq_3').style['mix-blend-mode'] = 'normal';
+        var layer_Conflicto_UPC_Homicidio_dmq_3 = new L.geoJson(json_Conflicto_UPC_Homicidio_dmq_3, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Conflicto_UPC_Homicidio_dmq_3',
+            layerName: 'layer_Conflicto_UPC_Homicidio_dmq_3',
+            pane: 'pane_Conflicto_UPC_Homicidio_dmq_3',
+            onEachFeature: pop_Conflicto_UPC_Homicidio_dmq_3,
+            style: style_Conflicto_UPC_Homicidio_dmq_3_0,
+        });
+        bounds_group.addLayer(layer_Conflicto_UPC_Homicidio_dmq_3);
+        map.addLayer(layer_Conflicto_UPC_Homicidio_dmq_3);
+        function pop_deslizamientos_dmq_4(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">GRADO DE AMENAZA</th>\
+                        <td>' + (feature.properties['tipo'] !== null ? Autolinker.link(feature.properties['tipo'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">DESCRIPCION</th>\
+                        <td>' + (feature.properties['descrip'] !== null ? Autolinker.link(feature.properties['descrip'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_deslizamientos_dmq_4_0(feature) {
+            switch(String(feature.properties['tipo'])) {
+                case 'Amenaza Alta':
+                    return {
+                pane: 'pane_deslizamientos_dmq_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,127,0,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Amenaza Baja':
+                    return {
+                pane: 'pane_deslizamientos_dmq_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,252,223,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Amenaza Media':
+                    return {
+                pane: 'pane_deslizamientos_dmq_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(247,238,107,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Amenaza Muy Alta':
+                    return {
+                pane: 'pane_deslizamientos_dmq_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(240,155,140,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Sin Amenaza':
+                    return {
+                pane: 'pane_deslizamientos_dmq_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(216,216,216,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_deslizamientos_dmq_4');
+        map.getPane('pane_deslizamientos_dmq_4').style.zIndex = 404;
+        map.getPane('pane_deslizamientos_dmq_4').style['mix-blend-mode'] = 'normal';
+        var layer_deslizamientos_dmq_4 = new L.geoJson(json_deslizamientos_dmq_4, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_deslizamientos_dmq_4',
+            layerName: 'layer_deslizamientos_dmq_4',
+            pane: 'pane_deslizamientos_dmq_4',
+            onEachFeature: pop_deslizamientos_dmq_4,
+            style: style_deslizamientos_dmq_4_0,
+        });
+        bounds_group.addLayer(layer_deslizamientos_dmq_4);
+        map.addLayer(layer_deslizamientos_dmq_4);
+        function pop_Hundimiento_dmq_5(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">DESCRIPCION</th>\
+                        <td>' + (feature.properties['DESCRIPCI�'] !== null ? Autolinker.link(feature.properties['DESCRIPCI�'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_Hundimiento_dmq_5_0(feature) {
+            switch(String(feature.properties['q2wHide_gridcode'])) {
+                case '0':
+                    return {
+                pane: 'pane_Hundimiento_dmq_5',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(246,224,80,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '1':
+                    return {
+                pane: 'pane_Hundimiento_dmq_5',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(122,15,37,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_Hundimiento_dmq_5');
+        map.getPane('pane_Hundimiento_dmq_5').style.zIndex = 405;
+        map.getPane('pane_Hundimiento_dmq_5').style['mix-blend-mode'] = 'normal';
+        var layer_Hundimiento_dmq_5 = new L.geoJson(json_Hundimiento_dmq_5, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Hundimiento_dmq_5',
+            layerName: 'layer_Hundimiento_dmq_5',
+            pane: 'pane_Hundimiento_dmq_5',
+            onEachFeature: pop_Hundimiento_dmq_5,
+            style: style_Hundimiento_dmq_5_0,
+        });
+        bounds_group.addLayer(layer_Hundimiento_dmq_5);
+        map.addLayer(layer_Hundimiento_dmq_5);
+        function pop_inundacion_dmq_6(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">RANGO DE DISTANCIA [km]</th>\
+                        <td>' + (feature.properties['EVENTOS_KM'] !== null ? Autolinker.link(feature.properties['EVENTOS_KM'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_inundacion_dmq_6_0(feature) {
+            switch(String(feature.properties['EVENTOS_KM'])) {
+                case '0-1':
+                    return {
+                pane: 'pane_inundacion_dmq_6',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(241,238,246,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '1.1-2':
+                    return {
+                pane: 'pane_inundacion_dmq_6',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(189,201,225,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '2.1-4':
+                    return {
+                pane: 'pane_inundacion_dmq_6',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(116,169,207,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '4.1-6':
+                    return {
+                pane: 'pane_inundacion_dmq_6',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(43,140,190,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '6.1-8':
+                    return {
+                pane: 'pane_inundacion_dmq_6',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(4,90,141,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_inundacion_dmq_6');
+        map.getPane('pane_inundacion_dmq_6').style.zIndex = 406;
+        map.getPane('pane_inundacion_dmq_6').style['mix-blend-mode'] = 'normal';
+        var layer_inundacion_dmq_6 = new L.geoJson(json_inundacion_dmq_6, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_inundacion_dmq_6',
+            layerName: 'layer_inundacion_dmq_6',
+            pane: 'pane_inundacion_dmq_6',
+            onEachFeature: pop_inundacion_dmq_6,
+            style: style_inundacion_dmq_6_0,
+        });
+        bounds_group.addLayer(layer_inundacion_dmq_6);
+        map.addLayer(layer_inundacion_dmq_6);
+        function pop_ola_calor_7(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">DESCRIPCION</th>\
+                        <td>' + (feature.properties['DESRIPCIÓ'] !== null ? Autolinker.link(feature.properties['DESRIPCIÓ'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">TEMPERATURA</th>\
+                        <td>' + (feature.properties['TEMPERATUR'] !== null ? Autolinker.link(feature.properties['TEMPERATUR'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_ola_calor_7_0(feature) {
+            switch(String(feature.properties['q2wHide_GRIDCODE'])) {
+                case '1':
+                    return {
+                pane: 'pane_ola_calor_7',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,255,178,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '2':
+                    return {
+                pane: 'pane_ola_calor_7',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(254,204,92,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '3':
+                    return {
+                pane: 'pane_ola_calor_7',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(253,141,60,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '4':
+                    return {
+                pane: 'pane_ola_calor_7',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(240,59,32,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '5':
+                    return {
+                pane: 'pane_ola_calor_7',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(189,0,38,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_ola_calor_7');
+        map.getPane('pane_ola_calor_7').style.zIndex = 407;
+        map.getPane('pane_ola_calor_7').style['mix-blend-mode'] = 'normal';
+        var layer_ola_calor_7 = new L.geoJson(json_ola_calor_7, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_ola_calor_7',
+            layerName: 'layer_ola_calor_7',
+            pane: 'pane_ola_calor_7',
+            onEachFeature: pop_ola_calor_7,
+            style: style_ola_calor_7_0,
+        });
+        bounds_group.addLayer(layer_ola_calor_7);
+        map.addLayer(layer_ola_calor_7);
+        function pop_sismos_dmq_8(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">FECHA</th>\
+                        <td>' + (feature.properties['Fecha'] !== null ? Autolinker.link(feature.properties['Fecha'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">LATITUD</th>\
+                        <td>' + (feature.properties['Latitud'] !== null ? Autolinker.link(feature.properties['Latitud'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">LONGITUD</th>\
+                        <td>' + (feature.properties['Longitud'] !== null ? Autolinker.link(feature.properties['Longitud'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">PROFUNDIDAD</th>\
+                        <td>' + (feature.properties['Profundida'] !== null ? Autolinker.link(feature.properties['Profundida'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Mw</th>\
+                        <td>' + (feature.properties['Mw'] !== null ? Autolinker.link(feature.properties['Mw'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">AÑO </th>\
+                        <td>' + (feature.properties['AA'] !== null ? Autolinker.link(feature.properties['AA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">MES</th>\
+                        <td>' + (feature.properties['Mes'] !== null ? Autolinker.link(feature.properties['Mes'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">DIA</th>\
+                        <td>' + (feature.properties['Dia'] !== null ? Autolinker.link(feature.properties['Dia'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">HORA</th>\
+                        <td>' + (feature.properties['Hora'] !== null ? Autolinker.link(feature.properties['Hora'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">MINUTO</th>\
+                        <td>' + (feature.properties['Minuto'] !== null ? Autolinker.link(feature.properties['Minuto'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">SEGUNDO</th>\
+                        <td>' + (feature.properties['Segundo'] !== null ? Autolinker.link(feature.properties['Segundo'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">CATÁLOGO</th>\
+                        <td>' + (feature.properties['Catalogo'] !== null ? Autolinker.link(feature.properties['Catalogo'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">FUENTE</th>\
+                        <td>' + (feature.properties['Fuente'] !== null ? Autolinker.link(feature.properties['Fuente'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ESCALA MAGNITUD</th>\
+                        <td>' + (feature.properties['Esc_Mag'] !== null ? Autolinker.link(feature.properties['Esc_Mag'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_sismos_dmq_8_0(feature) {
+            switch(String(feature.properties['Esc_Mag'])) {
+                case '3 - 3.56':
+                    return {
+                pane: 'pane_sismos_dmq_8',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(50,87,128,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(72,123,182,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '3.56 - 4.12':
+                    return {
+                pane: 'pane_sismos_dmq_8',
+                radius: 8.0,
+                opacity: 1,
+                color: 'rgba(61,128,53,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(84,176,74,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '4.12 - 4.68':
+                    return {
+                pane: 'pane_sismos_dmq_8',
+                radius: 12.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(224,207,72,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '4.68 - 5.24':
+                    return {
+                pane: 'pane_sismos_dmq_8',
+                radius: 16.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,127,0,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '5.24-5.8':
+                    return {
+                pane: 'pane_sismos_dmq_8',
+                radius: 20.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(227,26,28,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_sismos_dmq_8');
+        map.getPane('pane_sismos_dmq_8').style.zIndex = 408;
+        map.getPane('pane_sismos_dmq_8').style['mix-blend-mode'] = 'normal';
+        var layer_sismos_dmq_8 = new L.geoJson(json_sismos_dmq_8, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_sismos_dmq_8',
+            layerName: 'layer_sismos_dmq_8',
+            pane: 'pane_sismos_dmq_8',
+            onEachFeature: pop_sismos_dmq_8,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_sismos_dmq_8_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_sismos_dmq_8);
+        map.addLayer(layer_sismos_dmq_8);
+        function pop_amenaza_volcanica_dmq_9(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">TIPO DE AMENAZA VOLCÁNICA</th>\
+                        <td>' + (feature.properties['amen_volc'] !== null ? Autolinker.link(feature.properties['amen_volc'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">NOMBRE DEL VOLCAN</th>\
+                        <td>' + (feature.properties['volcan_'] !== null ? Autolinker.link(feature.properties['volcan_'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_amenaza_volcanica_dmq_9_0(feature) {
+            switch(String(feature.properties['amen_volc'])) {
+                default:
+                    return {
+                pane: 'pane_amenaza_volcanica_dmq_9',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(252,253,191,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Flujos de Lava, Mayor Peligro':
+                    return {
+                pane: 'pane_amenaza_volcanica_dmq_9',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(254,195,135,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Flujos de Lodo (Lahares), Mayor Peligro':
+                    return {
+                pane: 'pane_amenaza_volcanica_dmq_9',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(252,135,97,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Flujos de Lodo (Lahares), Menor Peligro':
+                    return {
+                pane: 'pane_amenaza_volcanica_dmq_9',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(231,81,99,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Flujos Piroclásticos y de Lava, Mayor Peligro':
+                    return {
+                pane: 'pane_amenaza_volcanica_dmq_9',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(182,54,121,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Flujos Piroclásticos y de Lava, Menor Peligro':
+                    return {
+                pane: 'pane_amenaza_volcanica_dmq_9',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(130,37,129,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Flujos Piroclásticos, Lava, Domos y Lahares, Menor Peligro':
+                    return {
+                pane: 'pane_amenaza_volcanica_dmq_9',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(178,223,138,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Flujos Piroclásticos, Mayor Peligro':
+                    return {
+                pane: 'pane_amenaza_volcanica_dmq_9',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(227,26,28,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Flujos Piroclásticos, Menor Peligro':
+                    return {
+                pane: 'pane_amenaza_volcanica_dmq_9',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(229,215,231,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_amenaza_volcanica_dmq_9');
+        map.getPane('pane_amenaza_volcanica_dmq_9').style.zIndex = 409;
+        map.getPane('pane_amenaza_volcanica_dmq_9').style['mix-blend-mode'] = 'normal';
+        var layer_amenaza_volcanica_dmq_9 = new L.geoJson(json_amenaza_volcanica_dmq_9, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_amenaza_volcanica_dmq_9',
+            layerName: 'layer_amenaza_volcanica_dmq_9',
+            pane: 'pane_amenaza_volcanica_dmq_9',
+            onEachFeature: pop_amenaza_volcanica_dmq_9,
+            style: style_amenaza_volcanica_dmq_9_0,
+        });
+        bounds_group.addLayer(layer_amenaza_volcanica_dmq_9);
+        map.addLayer(layer_amenaza_volcanica_dmq_9);
+        var osmGeocoder = new L.Control.Geocoder({
+            collapsed: true,
+            position: 'topleft',
+            text: 'Search',
+            title: 'Testing'
+        }).addTo(map);
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+        .className += ' fa fa-search';
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+        .title += 'Search for a place';
+        var baseMaps = {};
+        L.control.layers(baseMaps,{'amenaza_volcanica_dmq<br /><table><tr><td style="text-align: center;"><img src="legend/amenaza_volcanica_dmq_9_0.png" /></td><td></td></tr><tr><td style="text-align: center;"><img src="legend/amenaza_volcanica_dmq_9_FlujosdeLavaMayorPeligro1.png" /></td><td>Flujos de Lava, Mayor Peligro</td></tr><tr><td style="text-align: center;"><img src="legend/amenaza_volcanica_dmq_9_FlujosdeLodoLaharesMayorPeligro2.png" /></td><td>Flujos de Lodo (Lahares), Mayor Peligro</td></tr><tr><td style="text-align: center;"><img src="legend/amenaza_volcanica_dmq_9_FlujosdeLodoLaharesMenorPeligro3.png" /></td><td>Flujos de Lodo (Lahares), Menor Peligro</td></tr><tr><td style="text-align: center;"><img src="legend/amenaza_volcanica_dmq_9_FlujosPiroclásticosydeLavaMayorPeligro4.png" /></td><td>Flujos Piroclásticos y de Lava, Mayor Peligro</td></tr><tr><td style="text-align: center;"><img src="legend/amenaza_volcanica_dmq_9_FlujosPiroclásticosydeLavaMenorPeligro5.png" /></td><td>Flujos Piroclásticos y de Lava, Menor Peligro</td></tr><tr><td style="text-align: center;"><img src="legend/amenaza_volcanica_dmq_9_FlujosPiroclásticosLavaDomosyLaharesMenorPeligro6.png" /></td><td>Flujos Piroclásticos, Lava, Domos y Lahares, Menor Peligro</td></tr><tr><td style="text-align: center;"><img src="legend/amenaza_volcanica_dmq_9_FlujosPiroclásticosMayorPeligro7.png" /></td><td>Flujos Piroclásticos, Mayor Peligro</td></tr><tr><td style="text-align: center;"><img src="legend/amenaza_volcanica_dmq_9_FlujosPiroclásticosMenorPeligro8.png" /></td><td>Flujos Piroclásticos, Menor Peligro</td></tr></table>': layer_amenaza_volcanica_dmq_9,'sismos_dmq<br /><table><tr><td style="text-align: center;"><img src="legend/sismos_dmq_8_33560.png" /></td><td>3 - 3.56</td></tr><tr><td style="text-align: center;"><img src="legend/sismos_dmq_8_3564121.png" /></td><td>3.56 - 4.12</td></tr><tr><td style="text-align: center;"><img src="legend/sismos_dmq_8_4124682.png" /></td><td>4.12 - 4.68</td></tr><tr><td style="text-align: center;"><img src="legend/sismos_dmq_8_4685243.png" /></td><td>4.68 - 5.24</td></tr><tr><td style="text-align: center;"><img src="legend/sismos_dmq_8_524584.png" /></td><td>5.24-5.8</td></tr></table>': layer_sismos_dmq_8,'ola_calor<br /><table><tr><td style="text-align: center;"><img src="legend/ola_calor_7_MuyBajoPuedepermanecerenelexteriorsinningúnriesgo0.png" /></td><td>Muy Bajo (Puede permanecer en el exterior sin ningún riesgo)</td></tr><tr><td style="text-align: center;"><img src="legend/ola_calor_7_BajoUsegorroygafas1.png" /></td><td>Bajo (Use gorro y gafas)</td></tr><tr><td style="text-align: center;"><img src="legend/ola_calor_7_MedioUsegorrogafasprotectorsolar2.png" /></td><td>Medio (Use gorro, gafas, protector solar)</td></tr><tr><td style="text-align: center;"><img src="legend/ola_calor_7_AltoUsegorrogafasprotectorsolarbuso3.png" /></td><td>Alto (Use gorro, gafas, protector solar, buso)</td></tr><tr><td style="text-align: center;"><img src="legend/ola_calor_7_MuyAltoUsegorrogafasprotectorsolarbusosombrilla4.png" /></td><td>Muy Alto (Use gorro, gafas, protector solar, buso, sombrilla)</td></tr></table>': layer_ola_calor_7,'inundacion_dmq<br /><table><tr><td style="text-align: center;"><img src="legend/inundacion_dmq_6_01km0.png" /></td><td>0-1 km</td></tr><tr><td style="text-align: center;"><img src="legend/inundacion_dmq_6_112km1.png" /></td><td>1.1-2 km</td></tr><tr><td style="text-align: center;"><img src="legend/inundacion_dmq_6_214km2.png" /></td><td>2.1-4 km</td></tr><tr><td style="text-align: center;"><img src="legend/inundacion_dmq_6_416km3.png" /></td><td>4.1-6 km</td></tr><tr><td style="text-align: center;"><img src="legend/inundacion_dmq_6_618km4.png" /></td><td>6.1-8 km</td></tr></table>': layer_inundacion_dmq_6,'Hundimiento_dmq<br /><table><tr><td style="text-align: center;"><img src="legend/Hundimiento_dmq_5_ZonasSusceptiblesaHundimiento0.png" /></td><td>Zonas Susceptibles a Hundimiento</td></tr><tr><td style="text-align: center;"><img src="legend/Hundimiento_dmq_5_ZonasNoSusceptiblesaHundimiento1.png" /></td><td>Zonas No Susceptibles a Hundimiento</td></tr></table>': layer_Hundimiento_dmq_5,'deslizamientos_dmq<br /><table><tr><td style="text-align: center;"><img src="legend/deslizamientos_dmq_4_AmenazaAlta0.png" /></td><td>Amenaza Alta</td></tr><tr><td style="text-align: center;"><img src="legend/deslizamientos_dmq_4_AmenazaBaja1.png" /></td><td>Amenaza Baja</td></tr><tr><td style="text-align: center;"><img src="legend/deslizamientos_dmq_4_AmenazaMedia2.png" /></td><td>Amenaza Media</td></tr><tr><td style="text-align: center;"><img src="legend/deslizamientos_dmq_4_AmenazaMuyAlta3.png" /></td><td>Amenaza Muy Alta</td></tr><tr><td style="text-align: center;"><img src="legend/deslizamientos_dmq_4_SinAmenaza4.png" /></td><td>Sin Amenaza</td></tr></table>': layer_deslizamientos_dmq_4,'Conflicto_UPC_Homicidio_dmq<br /><table><tr><td style="text-align: center;"><img src="legend/Conflicto_UPC_Homicidio_dmq_3_ALTO0.png" /></td><td>ALTO</td></tr><tr><td style="text-align: center;"><img src="legend/Conflicto_UPC_Homicidio_dmq_3_BAJO1.png" /></td><td>BAJO</td></tr><tr><td style="text-align: center;"><img src="legend/Conflicto_UPC_Homicidio_dmq_3_MEDIO2.png" /></td><td>MEDIO</td></tr><tr><td style="text-align: center;"><img src="legend/Conflicto_UPC_Homicidio_dmq_3_MEDIOALTO3.png" /></td><td>MEDIO ALTO</td></tr><tr><td style="text-align: center;"><img src="legend/Conflicto_UPC_Homicidio_dmq_3_MEDIOBAJO4.png" /></td><td>MEDIO BAJO</td></tr><tr><td style="text-align: center;"><img src="legend/Conflicto_UPC_Homicidio_dmq_3_NULO5.png" /></td><td>NULO</td></tr></table>': layer_Conflicto_UPC_Homicidio_dmq_3,'<img src="legend/a_transito_fallecidos_2.png" /> a_transito_fallecidos': layer_a_transito_fallecidos_2,'<img src="legend/a_transito_heridos_1.png" /> a_transito_heridos': layer_a_transito_heridos_1,"OpenStreetMap": layer_OpenStreetMap_0,}).addTo(map);
+        setBounds();
+        </script>
+    </body>
+</html>
